@@ -1,13 +1,25 @@
-
 node {
-  stage('checkout sources') {
+    stage('checkout sources') {
         // You should change this to be the appropriate thing
-        git url: 'https://github.com/jschmersal-cscc/special-topics-labs-ci'
-  }
+        git url: 'https://github.com/ashtonflowers/special-topics-lab5'
+    }
 
-  stage('Build') {
-    // you should build this repo with a maven build step here
-    echo "hello"
-  }
-  // you should add a test report here
+    stage('Build') {
+        // you should build this repo with a maven build step here
+        withMaven(maven: 'maven3') {
+            sh "mvn package"
+        }
+
+        // you should add a test report here
+        try {
+            stage('Test') {
+                withMaven(maven: 'maven3') {
+                    sh "mvn test"
+                }
+            }
+        } finally {
+            junit '**/surefire-reports/*.xml'
+        }
+    }
+
 }
